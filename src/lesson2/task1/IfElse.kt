@@ -4,7 +4,8 @@ package lesson2.task1
 import lesson1.task1.discriminant
 import kotlin.math.max
 import kotlin.math.sqrt
-
+import kotlin.math.abs
+import kotlin.math.pow
 /**
  * Пример
  *
@@ -62,7 +63,25 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+
+
+/** год =========
+* 1, -1,
+*  года =========
+*  2,3,4,-2(>20),-3(>20),-4(>20),
+*  лет  =========
+*  5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+*  -5,-6,-7,-8,-9,-0
+*/
+fun ageDescription(age: Int): String {
+    return when {
+        age % 100 in 5..20 || age % 10 == 0 || age % 10 in 5..9 -> "$age лет"
+        age % 10 == 1 -> "$age год" /* если age = 11 этот вариант перехватится первым "свитчем" */
+        age % 10 in 2..4 -> "$age года" /*варианты 12,13,14 перехватятся первым "свитчем" */
+        else -> "не существует"
+    }
+
+}
 
 /**
  * Простая
@@ -73,7 +92,15 @@ fun ageDescription(age: Int): String = TODO()
  */
 fun timeForHalfWay(t1: Double, v1: Double,
                    t2: Double, v2: Double,
-                   t3: Double, v3: Double): Double = TODO()
+                   t3: Double, v3: Double): Double {
+    val halfway = (v1 * t1 + v2 * t2 + v3 * t3) / 2
+    return when {
+        halfway >= t1 * v1 + t2 * v2 -> t1 + t2 + (halfway - (t1 * v1 + t2 * v2)) / v3
+        halfway >= t1 * v1 -> t1 + (halfway - t1 * v1) / v2
+        else -> halfway / v1
+    }
+
+}
 
 /**
  * Простая
@@ -86,7 +113,13 @@ fun timeForHalfWay(t1: Double, v1: Double,
  */
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
-                       rookX2: Int, rookY2: Int): Int = TODO()
+                       rookX2: Int, rookY2: Int): Int {
+    if (rookX1 == kingX || rookY1 == kingY){
+        if (rookX2 == kingX || rookY2 == kingY) return 3
+        return 1
+    } else if (rookX2 == kingX || rookY2 == kingY) return 2
+    else return 0
+}
 
 /**
  * Простая
@@ -100,7 +133,16 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
  */
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
-                          bishopX: Int, bishopY: Int): Int = TODO()
+                          bishopX: Int, bishopY: Int): Int {
+    if (rookX == kingX || rookY == kingY){
+        if (abs(bishopX - kingX) == (abs(bishopY - kingY))) {
+            return 3
+        }
+        return 1
+    } else if (abs(bishopX - kingX) == (abs(bishopY - kingY))) {
+        return 2
+    } else return 0
+}
 
 /**
  * Простая
@@ -110,7 +152,27 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+   /**
+    * ========================================================
+    * return should be lifted out of 'if' --- как это сделать?
+    * ========================================================
+    * */
+    if (a + b > c && a + c > b && b + c > a) {
+        if (c * c == a * a + b * b || b * b == a * a + c * c || a * a == b * b + c * c) return 1
+        else if (c >= a && c >= b){
+            if(c * c < a * a + b * b) return 0
+            else return 2
+        } else if (b >= a && b >= c) {
+            if(b * b < a * a + c * c) return 0
+            else return 2
+        } else {
+            if (a * a < b * b + c * c) return 0
+            else return 2
+        }
+    } else return -1
+}
+
 
 /**
  * Средняя
@@ -120,4 +182,13 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    if (a > d || c > b) return -1
+    else if (b <= d) {
+        if (a <= c) return b - c
+        else return b - a
+    } else {
+        if (a <= c) return d - c
+        else return d - a
+    }
+}
