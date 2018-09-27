@@ -66,7 +66,10 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    if (n < 10) return 1
+    else return digitNumber(n / 10) + digitNumber(n % 10)
+}
 
 /**
  * Простая
@@ -74,7 +77,12 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    if (n == 1) return 1
+    else if (n == 2) return 1
+    else return fib(n - 1) + fib(n - 2)
+
+}
 
 /**
  * Простая
@@ -82,21 +90,45 @@ fun fib(n: Int): Int = TODO()
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = TODO()
+fun lcm(m: Int, n: Int): Int {
+    if (m % 2 == 0 || n % 2 == 0) {
+        for (i in 2..m * n step 2){
+            if (i % m == 0 && i % n == 0) return i
+        }
+    } else {
+        for (i in 3..m * n step 2) {
+            if (i % m == 0 && i % n == 0) return i
+        }
+    }
+    return 1
+}
 
 /**
  * Простая
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int {
+    if (n % 2 == 0) return 2
+    else {
+        for (i in 3..sqrt(n.toDouble()).toInt() step 2) {
+            if (n % i == 0) return i
+        }
+    }
+    return n
+}
 
 /**
  * Простая
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int {
+    for (i in n / 2 downTo 2) {
+        if (n % i == 0) return i
+    }
+    return 1
+}
 
 /**
  * Простая
