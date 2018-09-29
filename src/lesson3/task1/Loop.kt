@@ -79,12 +79,19 @@ fun digitNumber(n: Int): Int =
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int =
-        when (n) {
-            1 -> 1
-            2 -> 1
-            else -> fib(n - 1) + fib(n - 2)
-        }
+fun fib(n: Int): Int {
+    if (n == 1) return 1
+    if (n == 2) return 1
+    var a = 1
+    var b = 1
+    var R = 0
+    for (i in 3..n) {
+        R = a + b
+        a = b
+        b = R
+    }
+    return R
+}
 
 /**
  * Простая
@@ -146,10 +153,10 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    var result = false
-    for (i in m..n)
-        if ((sqrt(i.toDouble()) - sqrt(i.toDouble()).toInt()) == 0.0) result = true
-    return result
+    val mm = sqrt(m.toDouble()).toInt()
+    val nn = sqrt(n.toDouble()).toInt()
+    return (mm * mm == m || nn * nn == n) || nn != mm
+
 }
 
 /**
@@ -244,12 +251,12 @@ fun cos(x: Double, eps: Double): Double {
 fun revert(n: Int): Int {
     var res = 0
     var ghost = n
-    while (ghost != 0) {
+    while (ghost >= 10) {
         res += ghost % 10
         ghost /= 10
         res *= 10
     }
-    res /= 10
+    res += ghost % 10
     return res
 }
 
