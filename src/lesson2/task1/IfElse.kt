@@ -3,10 +3,7 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
-import kotlin.math.max
-import kotlin.math.sqrt
-import kotlin.math.abs
-import kotlin.math.pow
+import kotlin.math.*
 
 /**
  * Пример
@@ -152,14 +149,14 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
 fun triangleKind(a: Double, b: Double, c: Double): Int =
         if (a + b > c && a + c > b && b + c > a) {
             if (c * c == a * a + b * b || b * b == a * a + c * c || a * a == b * b + c * c) 1
-            else if (c >= a && c >= b) {
-                if (c * c < a * a + b * b) 0
+            else if (max(a, c) == c && max(b, c) == c) {
+                if (min(c * c, a * a + b * b) == c * c) 0
                 else 2
-            } else if (b >= a && b >= c) {
-                if (b * b < a * a + c * c) 0
+            } else if (max(a, b) == b && max(c, b) == b) {
+                if (min(b * b, a * a + c * c) == b * b) 0
                 else 2
             } else {
-                if (a * a < b * b + c * c) 0
+                if (min(a * a, b * b + c * c) == a * a) 0
                 else 2
             }
         } else -1
@@ -174,11 +171,5 @@ fun triangleKind(a: Double, b: Double, c: Double): Int =
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
-        if (a > d || c > b) -1
-        else if (b <= d) {
-            if (a <= c) b - c
-            else b - a
-        } else {
-            if (a <= c) d - c
-            else d - a
-        }
+        if (min(b, d) - max(a, c) >= 0) min(b, d) - max(a, c)
+        else -1
