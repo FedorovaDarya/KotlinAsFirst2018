@@ -146,20 +146,18 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int =
-        if (a + b > c && a + c > b && b + c > a) {
-            if (c * c == a * a + b * b || b * b == a * a + c * c || a * a == b * b + c * c) 1
-            else if (max(a, c) == c && max(b, c) == c) {
-                if (min(c * c, a * a + b * b) == c * c) 0
-                else 2
-            } else if (max(a, b) == b && max(c, b) == b) {
-                if (min(b * b, a * a + c * c) == b * b) 0
-                else 2
-            } else {
-                if (min(a * a, b * b + c * c) == a * a) 0
-                else 2
-            }
-        } else -1
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val min = minOf(a, b, c)
+    val max = maxOf(a, b, c)
+    val inter = a + b + c - (min + max)
+    return when {
+        max.pow(2) == min.pow(2) + inter.pow(2) -> 1
+        max.pow(2) > min.pow(2) + inter.pow(2) -> 2
+        max > inter + min -> -1
+        else -> 0
+    }
+
+}
 
 
 /**

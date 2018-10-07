@@ -59,6 +59,7 @@ class Tests {
         assertEquals(1, digitCountInNumber(510, 5))
         assertEquals(3, digitCountInNumber(4784041, 4))
         assertEquals(4, digitCountInNumber(5373393, 3))
+
     }
 
     @Test
@@ -70,6 +71,7 @@ class Tests {
         assertEquals(2, digitNumber(99))
         assertEquals(3, digitNumber(123))
         assertEquals(10, digitNumber(Int.MAX_VALUE))
+        assertEquals(6, digitNumber(-123456))
     }
 
     @Test

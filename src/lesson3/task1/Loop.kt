@@ -69,8 +69,8 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int =
-        if (n < 10) 1
-        else digitNumber(n / 10) + digitNumber(n % 10)
+        if (abs(n) < 10) 1
+        else digitNumber(abs(n) / 10) + digitNumber(abs(n) % 10)
 
 
 /**
@@ -156,7 +156,6 @@ fun squareBetweenExists(m: Int, n: Int): Boolean {
     val mm = sqrt(m.toDouble()).toInt()
     val nn = sqrt(n.toDouble()).toInt()
     return (mm * mm == m || nn * nn == n) || nn != mm
-
 }
 
 /**
@@ -178,14 +177,14 @@ fun squareBetweenExists(m: Int, n: Int): Boolean {
 fun collatzSteps(x: Int): Int {
     var steps = 0
     var ghost = x
-    while (ghost != 1)
+    while (ghost != 1) {
         if (ghost % 2 == 0) {
             ghost /= 2
-            steps++
         } else {
             ghost = ghost * 3 + 1
-            steps++
         }
+        steps++
+    }
     return steps
 }
 
@@ -197,22 +196,20 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun sin(x: Double, eps: Double): Double {
-    val ghost = x % (2 * PI)
-    var R = 0.0
-    var step = 1
-    var t = eps * 2
-    while (abs(t) >= eps) {
+    var ghost = x % (2 * PI)
+    var r = 0.0
+    var step = 0
+    while (abs(ghost) >= eps) {
+        step++
         if (step % 2 == 1) {
-            t = ghost.pow(2 * step - 1) / factorial(2 * step - 1)
-            R += t
-            step++
+            r += ghost
         } else {
-            t = ghost.pow(2 * step - 1) / factorial(2 * step - 1)
-            R -= t
-            step++
+            r -= ghost
         }
+        ghost = ghost * (x % (2 * PI)).pow(2) / ((step * 2) * (step * 2 + 1))
     }
-    return R
+
+    return r
 }
 
 /**
@@ -223,22 +220,19 @@ fun sin(x: Double, eps: Double): Double {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun cos(x: Double, eps: Double): Double {
-    val ghost = x % (2 * PI)
-    var R = 1.0
-    var step = 1
-    var t = eps * 2
-    while (abs(t) >= eps) {
+    var ghost = 1.0
+    var r = 0.0
+    var step = 0
+    while (abs(ghost) >= eps) {
+        step++
+        ghost = ghost * (x % (2 * PI)).pow(2) / ((step * 2 - 1) * (step * 2))
         if (step % 2 == 1) {
-            t = ghost.pow(2 * step ) / factorial(2 * step)
-            R -= t
-            step++
+            r -= ghost
         } else {
-            t = ghost.pow(2 * step) / factorial(2 * step)
-            R += t
-            step++
+            r += ghost
         }
     }
-    return R
+    return r + 1
 }
 
 /**
@@ -269,10 +263,8 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean {
-    val revertedGhost = revert(n)
-    return revertedGhost == n
-}
+fun isPalindrome(n: Int): Boolean =
+        revert(n) == n
 
 /**
  * Средняя
@@ -283,23 +275,21 @@ fun isPalindrome(n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun hasDifferentDigits(n: Int): Boolean {
-    var prev = n % 10
-    var ghost = n / 10
-    while (ghost != 0) {
-        if (prev != ghost % 10) return true
-        prev = ghost % 10
-        ghost /= 10
-    }
-    return false
-}
-fun numOfSymbols(n: Int): Int {
     var ghost = n
-    var R = 0
-    while (ghost != 0) {
-        R++
+    while (ghost >= 10 && ghost / 10 % 10 == ghost % 10)
         ghost /= 10
+    return ghost >= 10
+}
+
+fun getTheDigit(n: Int, numOfSymbols: Int, curr: Int): Int {
+    var num = numOfSymbols
+    var current = curr
+    while (num != n) {
+        num--
+        current /= 10
+
     }
-    return R
+    return current % 10
 }
 /**
  * Сложная
@@ -316,15 +306,10 @@ fun squareSequenceDigit(n: Int): Int {
 
     while (numOfSymbols < n) {
         curr++
-        numOfSymbols += numOfSymbols(curr * curr)
+        numOfSymbols += digitNumber(curr * curr)
     }
     curr *= curr                                  // чтобы не вводить новую переменную делаем из числа его квадрат
-    while (numOfSymbols != n) {
-        numOfSymbols--
-        curr /= 10
-
-    }
-return curr % 10
+return getTheDigit(n, numOfSymbols, curr)
 }
 
 /**
@@ -339,16 +324,12 @@ return curr % 10
 fun fibSequenceDigit(n: Int): Int {
     var curr: Int
     var step = 0
-    var kolvo = 0
-    while (kolvo < n) {
+    var numOfSymbols = 0
+    while (numOfSymbols < n) {
         step++
         curr = fib(step)
-        kolvo += numOfSymbols(curr)
+        numOfSymbols += digitNumber(curr)
     }
     curr = fib(step)
-    while (kolvo != n) {
-        kolvo--
-        curr /= 10
-    }
-    return curr % 10
+    return getTheDigit(n, numOfSymbols, curr)
 }
