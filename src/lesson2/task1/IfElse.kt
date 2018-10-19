@@ -151,9 +151,9 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
     val max = maxOf(a, b, c)
     val inter = a + b + c - (min + max)
     return when {
-        max.pow(2) == min.pow(2) + inter.pow(2) -> 1
-        max.pow(2) > min.pow(2) + inter.pow(2) -> 2
-        max > inter + min -> -1
+        max.pow(2) == min.pow(2) + inter.pow(2) && max < min + inter -> 1
+        max.pow(2) > min.pow(2) + inter.pow(2) && max < min + inter -> 2
+        max > (inter + min) -> -1
         else -> 0
     }
 

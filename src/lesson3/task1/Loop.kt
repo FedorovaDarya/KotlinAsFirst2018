@@ -1,8 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson3.task1
 
 import kotlin.math.*
-
 
 
 /**
@@ -40,7 +40,7 @@ fun isPrime(n: Int): Boolean {
  */
 fun isPerfect(n: Int): Boolean {
     var sum = 1
-    for (m in 2..n/2) {
+    for (m in 2..n / 2) {
         if (n % m > 0) continue
         sum += m
         if (sum > n) break
@@ -84,13 +84,13 @@ fun fib(n: Int): Int {
     if (n == 2) return 1
     var a = 1
     var b = 1
-    var R = 0
+    var r = 0
     for (i in 3..n) {
-        R = a + b
+        r = a + b
         a = b
-        b = R
+        b = r
     }
-    return R
+    return r
 }
 
 /**
@@ -145,6 +145,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
         if (m % i == 0 && n % i == 0) result = false
     return result
 }
+
 /**
  * Простая
  *
@@ -291,6 +292,7 @@ fun getTheDigit(n: Int, numOfSymbols: Int, curr: Int): Int {
     }
     return current % 10
 }
+
 /**
  * Сложная
  *
@@ -309,7 +311,7 @@ fun squareSequenceDigit(n: Int): Int {
         numOfSymbols += digitNumber(curr * curr)
     }
     curr *= curr                                  // чтобы не вводить новую переменную делаем из числа его квадрат
-return getTheDigit(n, numOfSymbols, curr)
+    return getTheDigit(n, numOfSymbols, curr)
 }
 
 /**
