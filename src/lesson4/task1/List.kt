@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson5.task1.findSumOfTwo
 import kotlin.math.*
 
 /**
@@ -115,7 +116,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
+fun abs(v: List<Double>): Double = sqrt(v.sumByDouble { it * it })
 
 
 /**
@@ -137,7 +138,7 @@ fun mean(list: List<Double>): Double =
  */
 fun center(list: MutableList<Double>): MutableList<Double> = if (list.size == 0) list else {
     val average = list.sum() / list.size
-    for (i in 0 until list.size) list[i] -= average
+    list.replaceAll { it -> it - average }
     list
 }
 
@@ -149,11 +150,8 @@ fun center(list: MutableList<Double>): MutableList<Double> = if (list.size == 0)
  * представленные в виде списков a и b. Скалярное произведение считать по формуле:
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.0.
  */
-fun times(a: List<Double>, b: List<Double>): Double {
-    var sum = 0.0
-    for (i in 0 until a.size) sum += a[i] * b[i]
-    return sum
-}
+fun times(a: List<Double>, b: List<Double>): Double = a.zip(b).sumByDouble { (first, second) -> first * second }
+
 
 /**
  * Средняя
@@ -163,15 +161,7 @@ fun times(a: List<Double>, b: List<Double>): Double {
  * Коэффициенты многочлена заданы списком p: (p0, p1, p2, p3, ..., pN).
  * Значение пустого многочлена равно 0.0 при любом x.
  */
-fun polynom(p: List<Double>, x: Double): Double {
-    var sumPolynom = 0.0
-    var currX = 1.0
-    for (i in 0 until p.size) {
-        sumPolynom += p[i] * currX
-        currX *= x
-    }
-    return sumPolynom
-}
+fun polynom(p: List<Double>, x: Double): Double = p.mapIndexed { index, elem -> elem * x.pow(index) }.sum()
 
 /**
  * Средняя
@@ -184,11 +174,9 @@ fun polynom(p: List<Double>, x: Double): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Double>): MutableList<Double> {
-    var sumOfPrev = if (list.isNotEmpty()) list[0] else 0.0
-    for (i in 1 until list.size) {
-        sumOfPrev += list[i]
-        list[i] = sumOfPrev
-    }
+    list.reverse()
+    list.forEachIndexed { index, _ -> list[index] = list.subList(index, list.size).sum() }
+    list.reverse()
     return list
 }
 
@@ -241,23 +229,17 @@ fun convert(n: Int, base: Int): List<Int> {
     return digits.reversed()
 }
 
-/**
- * Сложная
- *
- * Перевести заданное целое число n >= 0 в систему счисления с основанием 1 < base < 37.
- * Результат перевода вернуть в виде строки, цифры более 9 представлять латинскими
- * строчными буквами: 10 -> a, 11 -> b, 12 -> c и так далее.
- * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
- */
-fun convertToString(n: Int, base: Int): String {
-    var result = ""
-    val convertedRaw = convert(n, base)
-    for (digit in convertedRaw) {
-        result += if (digit < 10) digit.toString()
-        else (digit + 87).toChar()
-    }
-    return result
-}
+@Suppress("IMPLICIT_CAST_TO_ANY")
+        /**
+         * Сложная
+         *
+         * Перевести заданное целое число n >= 0 в систему счисления с основанием 1 < base < 37.
+         * Результат перевода вернуть в виде строки, цифры более 9 представлять латинскими
+         * строчными буквами: 10 -> a, 11 -> b, 12 -> c и так далее.
+         * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
+         */
+fun convertToString(n: Int, base: Int): String =
+        convert(n, base).map { digit -> if (digit < 10) digit.toString() else (digit + 87).toChar() }.joinToString(separator = "")
 
 /**
  * Средняя
@@ -267,12 +249,10 @@ fun convertToString(n: Int, base: Int): String {
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
 fun decimal(digits: List<Int>, base: Int): Int {
-    var result = 0
-    for ((power, i) in (digits.size - 1 downTo 0).withIndex()) {
-        result += digits[i] * base.toDouble().pow(power).toInt()
-    }
-    return result
+    val reversedDigits = digits.reversed()
+    return reversedDigits.foldRightIndexed(0) { idx, d, acc -> acc + d * base.toDouble().pow(idx).toInt() }
 }
+
 /**
  * Сложная
  *
@@ -282,13 +262,14 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: str = "13c", base = 14 -> 250
  */
+fun charToInt(c: Char): Int = c.hashCode()
+
 fun decimalFromString(str: String, base: Int): Int {
     var res = 0
-    var pow = str.length - 1
-    for (i in 0 until str.length) {
-        res += if (str[i].hashCode() - 48 < 10) (str[i].hashCode() - 48) * base.toDouble().pow(pow).toInt()
-        else (str[i].hashCode() - 87) * base.toDouble().pow(pow).toInt()
-        pow--
+    str.forEachIndexed { index, elem ->
+        res += if (charToInt(str[index]) - 48 < 10)
+            (charToInt(elem) - 48) * base.toDouble().pow(str.length - index - 1).toInt()
+        else (charToInt(elem) - 87) * base.toDouble().pow(str.length - index - 1).toInt()
     }
     return res
 }
@@ -314,6 +295,7 @@ fun roman(n: Int): String {
     }
     return result
 }
+
 /**
  * Очень сложная
  *

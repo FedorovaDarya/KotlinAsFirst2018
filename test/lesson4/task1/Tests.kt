@@ -142,6 +142,10 @@ class Tests {
     fun accumulate() {
         assertEquals(listOf<Double>(), accumulate(arrayListOf()))
         assertArrayEquals(
+                listOf(1.0, 3.0, 6.0).toDoubleArray(),
+                accumulate(arrayListOf(1.0, 2.0, 3.0)).toDoubleArray(),
+                1e-5)
+        assertArrayEquals(
                 listOf(3.14).toDoubleArray(),
                 accumulate(arrayListOf(3.14)).toDoubleArray(),
                 1e-5)
@@ -196,8 +200,8 @@ class Tests {
     @Tag("Normal")
     fun decimal() {
         assertEquals(1, decimal(listOf(1), 2))
-        assertEquals(100, decimal(listOf(1, 2, 1, 0), 4))
         assertEquals(250, decimal(listOf(1, 3, 12), 14))
+        assertEquals(100, decimal(listOf(1, 2, 1, 0), 4))
         assertEquals(1000, decimal(listOf(2, 14, 12), 19))
     }
 
@@ -205,8 +209,8 @@ class Tests {
     @Tag("Hard")
     fun decimalFromString() {
         assertEquals(1, decimalFromString("1", 2))
-        assertEquals(100, decimalFromString("1210", 4))
         assertEquals(250, decimalFromString("13c", 14))
+        assertEquals(100, decimalFromString("1210", 4))
         assertEquals(1000, decimalFromString("2ec", 19))
         assertEquals(35, decimalFromString("z", 36))
         assertEquals(Int.MAX_VALUE, decimalFromString("a02220281", 11))
