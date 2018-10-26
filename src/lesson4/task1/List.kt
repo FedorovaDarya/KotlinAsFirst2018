@@ -174,9 +174,16 @@ fun polynom(p: List<Double>, x: Double): Double = p.mapIndexed { index, elem -> 
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Double>): MutableList<Double> {
+    /*
     list.reverse()
     list.forEachIndexed { index, _ -> list[index] = list.subList(index, list.size).sum() }
     list.reverse()
+    */
+    for (i in list.size - 1 downTo 0) {
+        for (j in 1..i) {
+            list[i] += list[i - j]
+        }
+    }
     return list
 }
 
@@ -248,10 +255,9 @@ fun convertToString(n: Int, base: Int): String =
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int {
-    val reversedDigits = digits.reversed()
-    return reversedDigits.foldRightIndexed(0) { idx, d, acc -> acc + d * base.toDouble().pow(idx).toInt() }
-}
+fun decimal(digits: List<Int>, base: Int): Int =
+        digits.reversed().foldRightIndexed(0) { idx, d, acc -> acc + d * base.toDouble().pow(idx).toInt() }
+
 
 /**
  * Сложная
@@ -262,9 +268,7 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: str = "13c", base = 14 -> 250
  */
-fun charToInt(c: Char): Int = c.hashCode()
-
-fun decimalFromString(str: String, base: Int): Int {
+/*fun charToInt(c: Char): Int = c.hashCode()
     var res = 0
     str.forEachIndexed { index, elem ->
         res += if (charToInt(str[index]) - 48 < 10)
@@ -273,6 +277,15 @@ fun decimalFromString(str: String, base: Int): Int {
     }
     return res
 }
+*/
+fun charToInt(i: Char): Int = when (i) {
+    in '0'..'9' -> i - '0'
+    else -> i - 'a' + 10
+}
+
+fun decimalFromString(str: String, base: Int): Int =
+        decimal((str.map { charToInt(it) }), base)
+
 
 /**
  * Сложная
@@ -303,4 +316,108 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+
+fun gender(n: Int): String = if (n in 1000..9999) "female" else "male"
+
+fun repeatingPart(n: Int, mask: Int, gender: String): String {
+    var res = ""
+    res += when (n / mask / 100) {
+        1 -> "сто "
+        2 -> "двести "
+        3 -> "триста "
+        4 -> "четыреста "
+        5 -> "пятьсот "
+        6 -> "шестьсот "
+        7 -> "семьсот "
+        8 -> "восемьсот "
+        9 -> "девятьсот "
+        else -> ""
+    }
+    if (n / mask % 100 in 10..19) {
+        res += when (n / mask % 100) {
+            10 -> "десять "
+            11 -> "одиннадцать "
+            12 -> "двенадцать "
+            13 -> "тринадцать "
+            14 -> "четырнадцать "
+            15 -> "пятнадцать "
+            16 -> "шестнадцать "
+            17 -> "семнадцать "
+            18 -> "восемнадцать "
+            19 -> "девятнадцать "
+            else -> ""
+        }
+    } else {
+        res += when (n / mask % 100 / 10) {
+            2 -> "двадцать "
+            3 -> "тридцать "
+            4 -> "сорок "
+            5 -> "пятьдесят "
+            6 -> "шестьдесят "
+            7 -> "семьдесят "
+            8 -> "восемьдесят "
+            9 -> "девяносто "
+            else -> ""
+        }
+        if (n / mask % 100 - n / mask % 10 != 11 && n / mask % 10 == 1) {
+            res += if (gender == "female") "одна " else "один "
+        }
+        res += if (n / mask % 100 - n / mask % 10 != 12 && n / mask % 10 == 2) {
+            if (gender == "female") "две " else "два "
+        } else {
+            when (n / mask % 10) {
+                3 -> "три "
+                4 -> "четыре "
+                5 -> "пять "
+                6 -> "шесть "
+                7 -> "семь "
+                8 -> "восемь "
+                9 -> "девять "
+                else -> ""
+            }
+        }
+    }
+    return res
+}
+
+fun defineDeclination(n: Int, mask: Int): String {
+    var res = ""
+    when (n) {
+        in 1000000000..Int.MAX_VALUE -> res += when {
+            n / mask % 100 in 5..19 -> "миллиардов "
+            n / mask % 10 == 1 -> "миллиард "
+            n / mask % 100 in 2..4 -> "миллиарда "
+            else -> "миллиардов "
+        }
+        in 1000000..999999999 -> res += when {
+            n / mask % 100 in 5..19 -> "миллионов "
+            n / mask % 10 == 1 -> "миллион "
+            n / mask % 100 in 2..4 -> "миллиона "
+            else -> "миллионов "
+        }
+        in 1000..999999 -> res += when {
+            n / mask % 100 in 5..19 || n / mask % 10 == 0 -> "тысяч "
+            n / mask % 10 in 2..4 -> "тысячи "
+            n / mask % 10 == 1 -> "тысяча "
+            else -> "тысяч "
+        }
+        else -> res += ""
+    }
+return res
+}
+
+fun russian(n: Int): String {
+    var result = ""
+    var nn = n
+    var mask = 1000000000
+    while (mask >= nn) {
+        mask /= 1000
+    }
+    while (mask >= 1) {
+        result += repeatingPart(nn, mask, gender(mask)) + defineDeclination(nn, mask)
+        nn %= mask
+        mask /= 1000
+        if (mask == 1 && nn == 0) mask--
+    }
+    return result.substring(0, result.length - 1)
+}
