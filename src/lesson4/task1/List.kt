@@ -179,10 +179,8 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
     list.forEachIndexed { index, _ -> list[index] = list.subList(index, list.size).sum() }
     list.reverse()
     */
-    for (i in list.size - 1 downTo 0) {
-        for (j in 1..i) {
-            list[i] += list[i - j]
-        }
+    for (i in 1 until list.size) {
+        list[i] += list[i - 1]
     }
     return list
 }
@@ -359,11 +357,10 @@ fun repeatingPart(n: Int, mask: Int, gender: String): String {
             9 -> "девяносто "
             else -> ""
         }
-        if (n / mask % 100 - n / mask % 10 != 11 && n / mask % 10 == 1) {
-            res += if (gender == "female") "одна " else "один "
-        }
         res += if (n / mask % 100 - n / mask % 10 != 12 && n / mask % 10 == 2) {
             if (gender == "female") "две " else "два "
+        } else if (n / mask % 100 - n / mask % 10 != 11 && n / mask % 10 == 1) {
+            res += if (gender == "female") "одна " else "один "
         } else {
             when (n / mask % 10) {
                 3 -> "три "
@@ -403,12 +400,13 @@ fun defineDeclination(n: Int, mask: Int): String {
         }
         else -> res += ""
     }
-return res
+    return res
 }
 
 fun russian(n: Int): String {
     var result = ""
     var nn = n
+    if (n == 1) return "один"
     var mask = 1000000000
     while (mask >= nn) {
         mask /= 1000
