@@ -357,12 +357,23 @@ fun repeatingPart(n: Int, mask: Int, gender: String): String {
             9 -> "девяносто "
             else -> ""
         }
-        res += if (n / mask % 100 - n / mask % 10 != 12 && n / mask % 10 == 2) {
-            if (gender == "female") "две " else "два "
-        } else if (n / mask % 100 - n / mask % 10 != 11 && n / mask % 10 == 1) {
-            res += if (gender == "female") "одна " else "один "
+        if (gender == "female") {
+            res += when (n / mask % 10) {
+                1 -> "одна "
+                2 -> "две "
+                3 -> "три "
+                4 -> "четыре "
+                5 -> "пять "
+                6 -> "шесть "
+                7 -> "семь "
+                8 -> "восемь "
+                9 -> "девять "
+                else -> ""
+            }
         } else {
-            when (n / mask % 10) {
+            res += when (n / mask % 10) {
+                1 -> "один "
+                2 -> "два "
                 3 -> "три "
                 4 -> "четыре "
                 5 -> "пять "
