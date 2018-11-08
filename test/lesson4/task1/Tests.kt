@@ -231,6 +231,7 @@ class Tests {
     fun russian() {
 
         assertEquals("один", russian(1))
+        assertEquals("одна тысяча", russian(1000))
         assertEquals("триста семьдесят пять", russian(375))
         assertEquals("триста семьдесят один", russian(371))
         assertEquals("двадцать две тысячи девятьсот шестьдесят четыре", russian(22964))

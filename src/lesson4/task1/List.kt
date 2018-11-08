@@ -417,9 +417,8 @@ fun defineDeclination(n: Int, mask: Int): String {
 fun russian(n: Int): String {
     var result = ""
     var nn = n
-    if (n == 1) return "один"
     var mask = 1000000000
-    while (mask >= nn) {
+    while (mask > nn) {
         mask /= 1000
     }
     while (mask >= 1) {
