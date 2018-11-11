@@ -155,11 +155,16 @@ class Tests {
     fun containsIn() {
         assertTrue(containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")))
         assertFalse(containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")))
+        assertFalse(containsIn(mapOf("a" to "z"), mapOf("b" to "foo", "zenit" to "chempion")))
     }
 
     @Test
     @Tag("Normal")
     fun averageStockPrice() {
+        assertEquals(
+                mapOf("MSFT" to 150.0, "NFLX" to 45.0),
+                averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0, "NFLX" to 50.0))
+        )
         assertEquals(
                 mapOf<String, Double>(),
                 averageStockPrice(listOf())
@@ -171,10 +176,6 @@ class Tests {
         assertEquals(
                 mapOf("MSFT" to 150.0, "NFLX" to 40.0),
                 averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
-        )
-        assertEquals(
-                mapOf("MSFT" to 150.0, "NFLX" to 45.0),
-                averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0, "NFLX" to 50.0))
         )
     }
 
@@ -257,6 +258,12 @@ class Tests {
         assertEquals(
                 emptyList<String>(),
                 whoAreInBoth(listOf("Marat", "Mikhail"), listOf("Sveta", "Kirill"))
+
+        )
+        assertEquals(
+                listOf("Katya"),
+                whoAreInBoth(listOf("Katya", "Marat", "Mikhail", "Katya"), listOf("Katya", "Sveta", "Kirill"))
+
         )
     }
 
@@ -266,6 +273,8 @@ class Tests {
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
+        assertTrue(canBuildFrom(listOf('a', 'b', 'o', '/'), "BAOBAB/"))
+        assertTrue(canBuildFrom(listOf('A', 'b', 'o', '/'), "BaOBAB/"))
     }
 
     @Test
@@ -308,6 +317,10 @@ class Tests {
                 Pair(-1, -1),
                 findSumOfTwo(listOf(1, 2, 3), 6)
         )
+        assertEquals(
+                Pair(4, 8),
+                findSumOfTwo(listOf(124, 12351, 2324, 77, 0, 336, 26226, 991, 0), 0)
+        )
     }
 
     @Test
@@ -320,14 +333,5 @@ class Tests {
                         850
                 )
         )
-        assertEquals(
-                emptySet<String>(),
-                bagPacking(
-                        mapOf("Кубок" to (500 to 2000), "Слиток" to (1000 to 5000)),
-                        450
-                )
-        )
     }
-
-    // TODO: map task tests
 }

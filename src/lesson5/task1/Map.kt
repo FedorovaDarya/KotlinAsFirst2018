@@ -2,6 +2,8 @@
 
 package lesson5.task1
 
+import kotlin.math.absoluteValue
+
 /**
  * Пример
  *
@@ -136,7 +138,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
 fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
     var flag = true
     a.forEach { it ->
-        if (b.containsKey(it.key) && b.getValue(it.key) != a.getValue(it.key)) flag = false
+        if (b.containsKey(it.key) && b.getValue(it.key) != a.getValue(it.key) || !b.containsKey(it.key)) flag = false
     }
     return flag
 }
@@ -152,22 +154,39 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
-    val averaged = mutableMapOf<String, Double>()
-    val counter = mutableMapOf<String, Int>()
+    val counter = mutableMapOf<String, Double>()
+    val prices = mutableMapOf<String, Double>()
+    stockPrices.forEach { (first, _) ->
+        if (!counter.containsKey(first))
+            counter[first] = 1.0
+        else counter[first] = counter[first]!! + 1.0
+    }
     stockPrices.forEach { (first, second) ->
-        if (!averaged.containsKey(first)) {
-            averaged[first] = second
-            counter[first] = 1
-        } else {
-            averaged[first] = averaged[first]!! + second
-            counter[first] = counter[first]!! + 1
-        }
+        if (!prices.containsKey(first)) prices[first] = second / counter[first]!!
+        else
+            prices[first] = prices[first]!! + second / counter[first]!!
     }
-    averaged.forEach { action ->
-        averaged[action.key] = averaged[action.key]!! / counter[action.key]!!
-    }
-    return averaged
+    return prices
 }
+
+
+/*
+val averaged = mutableMapOf<String, Double>()
+val counter = mutableMapOf<String, Int>()
+stockPrices.forEach { (first, second) ->
+if (!averaged.containsKey(first)) {
+averaged[first] = second
+counter[first] = 1
+} else {
+averaged[first] = averaged[first]!! + second
+counter[first] = counter[first]!! + 1
+}
+}
+averaged.forEach { action ->
+averaged[action.key] = averaged[action.key]!! / counter[action.key]!!
+}
+return averaged
+ */
 
 
 /**
@@ -186,7 +205,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var result = ""
+    var result: String? = null
     var minCost = Double.MAX_VALUE
     stuff.forEach { iter ->
         if (iter.value.first == kind && iter.value.second <= minCost) {
@@ -194,8 +213,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
             minCost = iter.value.second
         }
     }
-    return if (result == "") null
-    else result
+    return result
 }
 
 /**
@@ -251,12 +269,10 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   subtractOf(a = mutableMapOf("a" to "z"), mapOf("a" to "z"))
  *     -> a changes to mutableMapOf() aka becomes empty
  */
-fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
-    b.forEach { item ->
-        if (a.containsKey(item.key) && a[item.key] == item.value) a.remove(item.key)
-    }
-    return
-}
+fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) =
+        a.keys.removeIf {
+            a[it] == b[it]
+        }
 
 /**
  * Простая
@@ -266,7 +282,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
     val list = mutableListOf<String>()
     for (name in a)
-        if (b.contains(name)) list.add(name)
+        if (b.contains(name) && !list.contains(name)) list.add(name)
     return list
 }
 
@@ -279,7 +295,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = word.all { letter -> chars.contains(letter) }
+
+//not passed : assertTrue(canBuildFrom(listOf('A', 'b', 'o', '/'), "BaOBAB/"))
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+        word.all { letter -> chars.contains(letter.toLowerCase()) || chars.contains(letter.toUpperCase()) }
 
 /**
  * Средняя
@@ -340,13 +359,13 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val soughtFor = number
-    for (i in 0 until list.size) {
-        if (list[i] < soughtFor && list.subList(i + 1, list.size).contains(soughtFor - list[i]))
-            return Pair(i, list.indexOf(soughtFor - list[i]))
+    for (i in 0 until list.size - 1) {
+        if (list[i] <= number && list.subList(i + 1, list.size).contains(number - list[i]))
+            return Pair(i, list.subList(i + 1, list.size).indexOf(number - list[i]) + i + 1)
     }
     return Pair(-1, -1)
 }
+
 /**
  * Очень сложная
  *
