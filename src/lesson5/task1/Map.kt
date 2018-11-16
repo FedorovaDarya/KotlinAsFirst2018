@@ -356,7 +356,7 @@ fun hasAnagrams(words: List<String>): Boolean {
 
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for (i in 0 until list.size - 1) {
-        if (list[i] <= number && list.contains(number - list[i]))
+        if (list[i] <= number && list.subList(i + 1, list.size).contains(number - list[i]))
             return Pair(i, list.subList(i + 1, list.size).indexOf(number - list[i]) + i + 1)
     }
     return Pair(-1, -1)
