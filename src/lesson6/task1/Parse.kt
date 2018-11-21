@@ -2,6 +2,10 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
+import lesson4.task1.decimalFromString
+import kotlin.math.abs
+
 /**
  * Пример
  *
@@ -49,12 +53,10 @@ fun main(args: Array<String>) {
         val seconds = timeStrToSeconds(line)
         if (seconds == -1) {
             println("Введённая строка $line не соответствует формату ЧЧ:ММ:СС")
-        }
-        else {
+        } else {
             println("Прошло секунд с начала суток: $seconds")
         }
-    }
-    else {
+    } else {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
@@ -71,7 +73,19 @@ fun main(args: Array<String>) {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val strSplitted = str.split(" ")
+    if (strSplitted.size != 3) return ""
+    val months = listOf("января", "февраля", "марта", "апреля", "мая",
+            "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+    val month = if (strSplitted[1] in months) months.indexOf(strSplitted[1]) + 1
+    else 0
+    val year = strSplitted[2].toIntOrNull()
+    val day = if (year != null && strSplitted[0].toInt() <= daysInMonth(month, year)) strSplitted[0].toInt()
+    else 0
+    return if (day == 0 || month == 0 || year == null) ""
+    else String.format("%02d.%02d.%d", day, month, year)
+}
 
 /**
  * Средняя
@@ -83,7 +97,19 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val parsed = digital.split(".")
+    if (parsed.size != 3) return ""
+    val year = parsed[2].toIntOrNull()
+    val months = listOf("января", "февраля", "марта", "апреля", "мая",
+            "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+    val month = if (parsed[1].toIntOrNull() in 1..12) months[parsed[1].toInt() - 1]
+    else ""
+    val day = if (year != null && parsed[0].toInt() <= daysInMonth(parsed[1].toInt(), year)) parsed[0].toInt()
+    else 0
+    return if (day == 0 || month == "") ""
+    else String.format("%d %s %02d", day, month, year)
+}
 
 /**
  * Средняя
@@ -97,7 +123,22 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+
+fun flattenPhoneNumber(phone: String): String {
+    var result = ""
+    val regexForbidden = """[^-+)\s\d(]""".toRegex()
+    if (regexForbidden.containsMatchIn(phone)) return ""
+    if ("+" in phone && phone.lastIndexOf('+') != 0) return ""
+    if (phone.contains(regexForbidden)) return ""
+    else {
+        val searchHere = "+0123456789"
+        phone.forEach { ch ->
+            if (ch in searchHere) result += ch
+        }
+    }
+    return result
+}
+
 
 /**
  * Средняя
@@ -109,7 +150,38 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val regexForbidden = """[^-%\s\d]""".toRegex()
+    val regexNumbers = Regex("""[1-9]""")
+    if (regexForbidden.containsMatchIn(jumps) || !regexNumbers.containsMatchIn(jumps)) return -1
+    var resultStr = ""
+    var resultInt = 0
+    var i = 0
+    while (i < jumps.length) {
+        val ch = jumps[i]
+        if (ch in "0123456789") {
+            resultStr += ch.toString()
+            var j = i + 1
+            while (j < jumps.length) {
+                if (jumps[j] in "0123456789") {
+                    resultStr += jumps[j]
+                    j++
+                } else {
+                    j += resultStr.length
+                    break
+                }
+            }
+            i += resultStr.length
+            if (decimalFromString(resultStr, 10) > resultInt) {
+                resultInt = decimalFromString(resultStr, 10)
+            }
+            resultStr = ""
+        } else {
+            i++
+        }
+    }
+    return resultInt
+}
 
 /**
  * Сложная
@@ -121,7 +193,31 @@ fun bestLongJump(jumps: String): Int = TODO()
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+
+
+fun bestHighJump(jumps: String): Int {
+    val regexForbidden = """([^-%+\s\d]|\d(\s)+\d|[+-]\s*[+-])""".toRegex()
+    val regexNumbers = Regex("""[1-9]""")
+    if (regexForbidden.containsMatchIn(jumps) || !regexNumbers.containsMatchIn(jumps)) return -1
+    val jumpsToChars = jumps.replace(" ", "")
+    var resultInt = 0
+    for (i in 0 until jumpsToChars.length - 1) {
+        val ch = jumpsToChars[i]
+        var resultStr = ""
+        if (ch in "01234566789") {
+            resultStr += ch
+            var j = i + 1
+            while (jumpsToChars[j] in "0123456789") {
+                resultStr += jumpsToChars[j]
+                j++
+            }
+            if (jumpsToChars[j] == '+' && resultStr.toInt() > resultInt)
+                resultInt = resultStr.toInt()
+        }
+    }
+    return resultInt
+}
+
 
 /**
  * Сложная
