@@ -108,7 +108,7 @@ fun dateDigitToStr(digital: String): String {
     val day = if (year != null && parsed[0].toInt() <= daysInMonth(parsed[1].toInt(), year)) parsed[0].toInt()
     else 0
     return if (day == 0 || month == "") ""
-    else String.format("%d %s %02d", day, month, year)
+    else String.format("%d %s %d", day, month, year)
 }
 
 /**
@@ -152,7 +152,7 @@ fun flattenPhoneNumber(phone: String): String {
  */
 fun bestLongJump(jumps: String): Int {
     val regexForbidden = """[^-%\s\d]""".toRegex()
-    val regexNumbers = Regex("""[1-9]""")
+    val regexNumbers = Regex("""[0-9]""")
     if (regexForbidden.containsMatchIn(jumps) || !regexNumbers.containsMatchIn(jumps)) return -1
     var resultStr = ""
     var resultInt = 0
@@ -197,10 +197,10 @@ fun bestLongJump(jumps: String): Int {
 
 fun bestHighJump(jumps: String): Int {
     val regexForbidden = """([^-%+\s\d]|\d(\s)+\d|[+-]\s*[+-])""".toRegex()
-    val regexNumbers = Regex("""[1-9]""")
+    val regexNumbers = Regex("""[0-9]""")
     if (regexForbidden.containsMatchIn(jumps) || !regexNumbers.containsMatchIn(jumps)) return -1
     val jumpsToChars = jumps.replace(" ", "")
-    var resultInt = 0
+    var resultInt = -1
     for (i in 0 until jumpsToChars.length - 1) {
         val ch = jumpsToChars[i]
         var resultStr = ""
@@ -228,7 +228,25 @@ fun bestHighJump(jumps: String): Int {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val forbidden = """([^-+\d\s]|\d(\s)+\d|[+-]\s*[+-]|(\d[+-])|([+-]\d))""".toRegex()
+    val regexNumbers = """[0-9]""".toRegex()
+    if (forbidden.containsMatchIn(expression) || !regexNumbers.containsMatchIn(expression))
+        throw IllegalArgumentException("нарушение формата")
+    val toUnits = expression.split(" ")
+    var result = toUnits[0].toInt()
+    if (toUnits.size > 2) {
+        for (i in 2 until (toUnits.size / 2) * 2 + 1 step 2) {   //такое ранжирование для случая,
+            if (regexNumbers.containsMatchIn(toUnits[i])) {       // если последнее не число, а [-+]
+                when (toUnits[i - 1]) {
+                    "+" -> result += toUnits[i].toInt()
+                    "-" -> result -= toUnits[i].toInt()
+                }
+            }
+        }
+    }
+    return result
+}
 
 /**
  * Сложная
@@ -239,7 +257,25 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+
+    val regexForbidden = """[^а-яА-Я\sёЁ]""".toRegex()
+    if (regexForbidden.containsMatchIn(str)) throw IllegalArgumentException()
+    val words = str.toLowerCase().split(" ")
+    val indexes = mutableListOf<Int>()
+    var curr: Char
+    var prev = str[0]
+    if (str.isNotEmpty()) indexes.add(0)
+    println(indexes)
+    for (i in 1 until str.length) {
+        curr = str[i]
+        if (prev == ' ' && curr != ' ') indexes.add(i)
+        prev = curr
+    }
+    for (i in 0 until words.size - 1)
+        if (words[i] == words[i + 1]) return indexes[i]
+    return -1
+}
 
 /**
  * Сложная
@@ -252,7 +288,24 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    val regexForbidden = """([^а-яА-ЯёЁ;.\d\s]|([а-яА-ЯёЁ](\d|;))|\d([а-яА-ЯёЁ]|\s))""".toRegex()
+    if (regexForbidden.containsMatchIn(description)) return ""
+    val ghost = description.replace(";", "")
+    val units = ghost.split(" ")
+    var maxVal = 0.0
+    var name = ""
+    for (i in 1 until units.size step 2) {
+        if (units[i].toDoubleOrNull() == null || units[i - 1].toDoubleOrNull() != null) return "" // если порядок не продукт-цена-продукт-цена,то это нарушение формата
+        else {
+            if (units[i].toDouble() >= maxVal) {
+                maxVal = units[i].toDouble()
+                name = units[i - 1]
+            }
+        }
+    }
+    return name
+}
 
 /**
  * Сложная
