@@ -100,7 +100,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     val mapC = mapA.toMutableMap()
     for ((name, number) in mapB) {
         if (name !in mapC) mapC[name] = number
-        else if (mapC[name] != mapB[name]) mapC[name] = mapC[name] + ", " + mapB[name]
+        else if (mapC[name] != number) mapC[name] = mapC[name] + ", " + number
     }
     return mapC
 }
@@ -325,10 +325,10 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
 
 fun hasAnagrams(words: List<String>): Boolean {
     var result = false
-    val newListOfWords = mutableListOf<List<Char>>()
-    for (word in words) {
+    val newListOfWords = words.map { word -> word.toList().sorted() }
+    /*for (word in words) {
         newListOfWords.add(word.toList().sorted())
-    }
+    }*/
     newListOfWords.forEachIndexed { it, list ->
         for (i in (it + 1) until newListOfWords.size)
             if (list == newListOfWords[i]) result = true

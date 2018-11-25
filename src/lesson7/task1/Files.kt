@@ -55,9 +55,20 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+ /*   val matches = mutableMapOf<String, Int>()
+    for (i in substrings) {
+        matches[i.toLowerCase()] = 0
+    }
+    for (line in File(inputName).readLines()) {
+        for (mold in matches.keys) {
+           matches[mold] += line.count(mold)
+        }
+   }
+return matches
+}
+*/
 
-
-/**
+    /**
  * Средняя
  *
  * В русском языке, как правило, после букв Ж, Ч, Ш, Щ пишется И, А, У, а не Ы, Я, Ю.
