@@ -2,6 +2,7 @@
 
 package lesson7.task1
 
+import lesson2.task1.timeForHalfWay
 import java.io.File
 
 /**
@@ -32,8 +33,7 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
                 if (word.length + currentLineLength >= lineLength) {
                     outputStream.newLine()
                     currentLineLength = 0
-                }
-                else {
+                } else {
                     outputStream.write(" ")
                     currentLineLength++
                 }
@@ -54,21 +54,27 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
- /*   val matches = mutableMapOf<String, Int>()
-    for (i in substrings) {
-        matches[i.toLowerCase()] = 0
-    }
-    for (line in File(inputName).readLines()) {
-        for (mold in matches.keys) {
-           matches[mold] += line.count(mold)
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val list = mutableMapOf<String, Int>()
+    val text = File(inputName).readText().toLowerCase()
+    for (i in 0 until substrings.size) {
+        if (substrings[i] !in list.keys) {
+            var j = 0
+            var index = -1
+            var counter = 0
+            while (j < text.length) {
+                index = text.indexOf(substrings[i].toLowerCase(), index + 1)
+                if (index == -1) break
+                counter++
+                j = index + 1
+            }
+            list[substrings[i]] = counter
         }
-   }
-return matches
+    }
+    return list
 }
-*/
 
-    /**
+/**
  * Средняя
  *
  * В русском языке, как правило, после букв Ж, Ч, Ш, Щ пишется И, А, У, а не Ы, Я, Ю.
@@ -82,7 +88,24 @@ return matches
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val outputStream = File(outputName).bufferedWriter()
+    val text = File(inputName).readText()
+    outputStream.write(text[0].toString())
+    for (index in 1 until text.length) {
+        var ch = text[index]
+        if (text[index - 1] in "жЖчЧшШщЩ") {
+            when (text[index]) {
+                'ы' -> ch = 'и'
+                'Ы' -> ch = 'И'
+                'я' -> ch = 'а'
+                'Я' -> ch = 'А'
+                'ю' -> ch = 'у'
+                'Ю' -> ch = 'У'
+            }
+        }
+        outputStream.write(ch.toString())
+    }
+    outputStream.close()
 }
 
 /**
@@ -103,7 +126,22 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    var maxLen = 0
+    val outputStream = File(outputName).bufferedWriter()
+    for (line in File(inputName).readLines()) if (line.length > maxLen) maxLen = line.length
+    //var str = "     gljhfljhl"
+    //for (i in str) {
+    //  if (i == ' ') str = str.drop(1)
+    //}
+    //println(str.padStart(100, '#'))
+    for (line in File(inputName).readLines()) {
+        var newLine = line.trim()
+        println(newLine)
+        newLine = newLine.padStart((maxLen - newLine.length) / 2 + newLine.length, ' ')
+        outputStream.write(newLine)
+        outputStream.newLine()
+    }
+    outputStream.close()
 }
 
 /**
@@ -127,14 +165,54 @@ fun centerFile(inputName: String, outputName: String) {
  * 6) Число пробелов между более левой парой соседних слов должно быть больше или равно числу пробелов
  *    между более правой парой соседних слов.
  *
- * Следует учесть, что входной файл может содержать последовательности из нескольких пробелов  между слвоами. Такие
+ * Следует учесть, что входной файл может содержать последовательности из нескольких пробелов  между словами. Такие
  * последовательности следует учитывать при выравнивании и при необходимости избавляться от лишних пробелов.
  * Из этого следуют следующие правила:
  * 7) В самой длинной строке каждая пара соседних слов должна быть отделена В ТОЧНОСТИ одним пробелом
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    /*
+    //////
+    val example = "    jhgj jd ss  ".trim()
+    val exampleOutput = example.split(" ")
+    for (word in exampleOutput) println(word)
+    ////////
+    */
+    val outputStream = File(outputName).bufferedWriter()
+    var maxLen = 0
+    for (line in File(inputName).readLines())
+        if (line.trim().length > maxLen) maxLen = line.trim().length
+    for (line in File(inputName).readLines()) {
+        if (line.isEmpty() || !"""[^\s]""".toRegex().containsMatchIn(line)) {               //если пустая или ничего, кроме пробелов
+
+            outputStream.newLine()
+            continue
+        } else if (line.trim().split(" ").size == 1) {
+            outputStream.write(line.trim())
+            outputStream.newLine()
+            continue
+        } else {
+            val rawLen = line.trim().length                                                 // чтобы знать,до скольки символов дополнять
+            val setOfWords = line.trim().split(" ")
+            val numOfBackspacesBlocks = setOfWords.size - 1                                 //мест между одним и вторым словом
+            val currRawAmountOfBackspaces = maxLen - rawLen + numOfBackspacesBlocks         //сколько всего пробелов ракидывать будем-с?
+
+            val commonNumOfBackspaces = currRawAmountOfBackspaces / numOfBackspacesBlocks   //без прибавления остатка, поровну, пробелов
+            val r = currRawAmountOfBackspaces % numOfBackspacesBlocks                       //остаток,который нужно раскидать по одному в начале
+            var resultString = ""
+            for (i in 0 until r) {
+                resultString = resultString + setOfWords[i] + " ".repeat(commonNumOfBackspaces + 1)
+            }
+            for (i in r until setOfWords.size - 1) {
+                resultString = resultString + setOfWords[i] + " ".repeat(commonNumOfBackspaces)
+            }
+            resultString += setOfWords.last()
+            outputStream.write(resultString)
+            outputStream.newLine()
+        }
+    }
+    outputStream.close()
 }
 
 /**
@@ -254,15 +332,15 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -305,61 +383,61 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
-    <ul>
-      <li>
-        Утка по-пекински
-        <ul>
-          <li>Утка</li>
-          <li>Соус</li>
-        </ul>
-      </li>
-      <li>
-        Салат Оливье
-        <ol>
-          <li>Мясо
-            <ul>
-              <li>
-                  Или колбаса
-              </li>
-            </ul>
-          </li>
-          <li>Майонез</li>
-          <li>Картофель</li>
-          <li>Что-то там ещё</li>
-        </ol>
-      </li>
-      <li>Помидоры</li>
-      <li>
-        Яблоки
-        <ol>
-          <li>Красные</li>
-          <li>Зелёные</li>
-        </ol>
-      </li>
-    </ul>
-  </body>
+<body>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>
+Или колбаса
+</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>
+Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ul>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -386,23 +464,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
@@ -416,16 +494,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
