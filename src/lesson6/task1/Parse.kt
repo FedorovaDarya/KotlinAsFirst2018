@@ -159,7 +159,7 @@ fun bestLongJump(jumps: String): Int {
     var i = 0
     while (i < jumps.length) {
         val ch = jumps[i]
-        if (ch in "0123456789") {
+        if (ch.isDigit()) {
             resultStr += ch.toString()
             var j = i + 1
             while (j < jumps.length) {
@@ -296,7 +296,8 @@ fun mostExpensive(description: String): String {
     var maxVal = 0.0
     var name = ""
     for (i in 1 until units.size step 2) {
-        if (units[i].toDoubleOrNull() == null || units[i - 1].toDoubleOrNull() != null) return "" // если порядок не продукт-цена-продукт-цена,то это нарушение формата
+        if (units[i].toDoubleOrNull() == null || units[i - 1].toDoubleOrNull() != null) return ""
+            // если порядок не продукт-цена-продукт-цена,то это нарушение формата
         else {
             if (units[i].toDouble() >= maxVal) {
                 maxVal = units[i].toDouble()
