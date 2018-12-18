@@ -254,21 +254,16 @@ fun plusMinus(expression: String): Int {
  */
 fun firstDuplicateIndex(str: String): Int {
 
-    val regexForbidden = """[^а-яА-Я\sёЁ]""".toRegex()
-    if (regexForbidden.containsMatchIn(str)) throw IllegalArgumentException()
-    val words = str.toLowerCase().split(" ")
-    val indexes = mutableListOf<Int>()
-    var curr: Char
-    var prev = str[0]
-    if (str.isNotEmpty()) indexes.add(0)
-    println(indexes)
-    for (i in 1 until str.length) {
-        curr = str[i]
-        if (prev == ' ' && curr != ' ') indexes.add(i)
-        prev = curr
+    val regexForbidden = """([^а-яА-Я\sёЁ]|\s{2,})""".toRegex()
+    if (regexForbidden.containsMatchIn(str)) return -1
+    val formattedStr = str.toLowerCase()
+    var index = 0
+    for (i in 0 until formattedStr.split(" ").size - 1) {
+        if (formattedStr.split(" ")[i] == formattedStr.split(" ")[i + 1]) return index
+        else
+            index += 1 + formattedStr.split(" ")[i].length
     }
-    for (i in 0 until words.size - 1)
-        if (words[i] == words[i + 1]) return indexes[i]
+
     return -1
 }
 

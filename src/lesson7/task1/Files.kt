@@ -89,6 +89,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
+    outputStream.write("")
     val text = File(inputName).readText()
     outputStream.write(text[0].toString())
     for (index in 1 until text.length) {
@@ -128,12 +129,12 @@ fun sibilants(inputName: String, outputName: String) {
 fun centerFile(inputName: String, outputName: String) {
     var maxLen = 0
     val outputStream = File(outputName).bufferedWriter()
-    for (line in File(inputName).readLines()) if (line.length > maxLen) maxLen = line.length
-    for (line in File(inputName).readLines()) {
-        var newLine = line.trim()
-        println(newLine)
-        newLine = newLine.padStart(((maxLen - newLine.length) / 2 + newLine.length), ' ')
-        outputStream.write(newLine)
+    val trimmed = File(inputName).readLines().toList().map { it.trim() }
+    for (line in trimmed) if (line.length > maxLen) maxLen = line.length
+    for (line in trimmed) {
+        val builder = StringBuilder()
+        builder.append(" ".repeat((maxLen - line.length) / 2)).append(line)
+        outputStream.write(builder.toString())
         outputStream.newLine()
     }
     outputStream.close()
@@ -172,7 +173,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     for (line in File(inputName).readLines())
         if (line.trim().length > maxLen) maxLen = line.trim().length
     for (line in File(inputName).readLines()) {
-        if (line.isEmpty() || !"""[^\s]""".toRegex().containsMatchIn(line)) {               //если пустая или ничего, кроме пробелов
+        if (line.isEmpty() || !"""[^\s]""".toRegex().containsMatchIn(line)) {  //если пустая или ничего, кроме пробелов
 
             outputStream.newLine()
             continue
@@ -181,13 +182,14 @@ fun alignFileByWidth(inputName: String, outputName: String) {
             outputStream.newLine()
             continue
         } else {
-            val rawLen = line.trim().length                                                 // чтобы знать,до скольки символов дополнять
+            val rawLen = line.trim().length                         // чтобы знать,до скольки символов дополнять
             val setOfWords = line.trim().split(" ")
-            val numOfBackspacesBlocks = setOfWords.size - 1                                 //мест между одним и вторым словом
-            val currRawAmountOfBackspaces = maxLen - rawLen + numOfBackspacesBlocks         //сколько всего пробелов ракидывать будем-с?
-
-            val commonNumOfBackspaces = currRawAmountOfBackspaces / numOfBackspacesBlocks   //без прибавления остатка, поровну, пробелов
-            val r = currRawAmountOfBackspaces % numOfBackspacesBlocks                       //остаток,который нужно раскидать по одному в начале
+            val numOfBackspacesBlocks = setOfWords.size - 1            //мест между одним и вторым словом
+            val currRawAmountOfBackspaces = maxLen - rawLen + numOfBackspacesBlocks
+                                                                                //сколько всего пробелов ракидывать будем-с?
+            val commonNumOfBackspaces = currRawAmountOfBackspaces / numOfBackspacesBlocks
+                                                                            //без прибавления остатка, поровну, пробелов
+            val r = currRawAmountOfBackspaces % numOfBackspacesBlocks   //остаток,который нужно раскидать по одному в начале
             var resultString = ""
             for (i in 0 until r) {
                 resultString = resultString + setOfWords[i] + " ".repeat(commonNumOfBackspaces + 1)
