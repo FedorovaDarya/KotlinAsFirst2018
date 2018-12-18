@@ -4,7 +4,7 @@ package lesson7.task1
 
 import lesson2.task1.timeForHalfWay
 import java.io.File
-
+import kotlin.math.*
 /**
  * Пример
  *
@@ -129,15 +129,10 @@ fun centerFile(inputName: String, outputName: String) {
     var maxLen = 0
     val outputStream = File(outputName).bufferedWriter()
     for (line in File(inputName).readLines()) if (line.length > maxLen) maxLen = line.length
-    //var str = "     gljhfljhl"
-    //for (i in str) {
-    //  if (i == ' ') str = str.drop(1)
-    //}
-    //println(str.padStart(100, '#'))
     for (line in File(inputName).readLines()) {
         var newLine = line.trim()
         println(newLine)
-        newLine = newLine.padStart((maxLen - newLine.length) / 2 + newLine.length, ' ')
+        newLine = newLine.padStart(((maxLen.toDouble() - newLine.length) / 2.0 + newLine.length.toDouble()).toInt(), ' ')
         outputStream.write(newLine)
         outputStream.newLine()
     }
@@ -172,13 +167,6 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    /*
-    //////
-    val example = "    jhgj jd ss  ".trim()
-    val exampleOutput = example.split(" ")
-    for (word in exampleOutput) println(word)
-    ////////
-    */
     val outputStream = File(outputName).bufferedWriter()
     var maxLen = 0
     for (line in File(inputName).readLines())
@@ -212,8 +200,10 @@ fun alignFileByWidth(inputName: String, outputName: String) {
             outputStream.newLine()
         }
     }
+    outputStream.write("")
     outputStream.close()
 }
+
 
 /**
  * Средняя
