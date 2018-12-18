@@ -132,7 +132,7 @@ fun centerFile(inputName: String, outputName: String) {
     for (line in File(inputName).readLines()) {
         var newLine = line.trim()
         println(newLine)
-        newLine = newLine.padStart(((maxLen.toDouble() - newLine.length) / 2.0 + newLine.length.toDouble()).toInt(), ' ')
+        newLine = newLine.padStart(((maxLen - newLine.length) / 2 + newLine.length), ' ')
         outputStream.write(newLine)
         outputStream.newLine()
     }

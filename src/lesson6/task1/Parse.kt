@@ -4,6 +4,7 @@ package lesson6.task1
 
 import lesson2.task2.daysInMonth
 import lesson4.task1.decimalFromString
+import java.lang.NumberFormatException
 import kotlin.math.abs
 
 /**
@@ -199,21 +200,15 @@ fun bestHighJump(jumps: String): Int {
     val regexForbidden = """([^-%+\s\d]|\d(\s)+\d|[+-]\s*[+-])""".toRegex()
     val regexNumbers = Regex("""[0-9]""")
     if (regexForbidden.containsMatchIn(jumps) || !regexNumbers.containsMatchIn(jumps)) return -1
-    val jumpsToChars = jumps.replace(" ", "")
+    val jumpsToChars = jumps.split(Regex("""(?<=[-%+])\s"""))
     var resultInt = -1
-    for (i in 0 until jumpsToChars.length - 1) {
-        val ch = jumpsToChars[i]
-        var resultStr = ""
-        if (ch in "01234566789") {
-            resultStr += ch
-            var j = i + 1
-            while (jumpsToChars[j] in "0123456789") {
-                resultStr += jumpsToChars[j]
-                j++
-            }
-            if (jumpsToChars[j] == '+' && resultStr.toInt() > resultInt)
-                resultInt = resultStr.toInt()
+    try {
+        for (i in 0 until jumpsToChars.size) {
+            if ("+" in jumpsToChars[i] && jumpsToChars[i].split(" ")[0].toInt() > resultInt)
+                resultInt = jumpsToChars[i].split(" ")[0].toInt()
         }
+    } catch (e: NumberFormatException) {
+        return -1
     }
     return resultInt
 }
@@ -291,19 +286,18 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     val regexForbidden = """([^а-яА-ЯёЁ;.\d\s]|([а-яА-ЯёЁ](\d|;))|\d([а-яА-ЯёЁ]|\s))""".toRegex()
     if (regexForbidden.containsMatchIn(description)) return ""
-    val ghost = description.replace(";", "")
-    val units = ghost.split(" ")
-    var maxVal = 0.0
+    val units = description.split("; ").map { it.split(" ") }
+    var maxVal = -1.0
     var name = ""
-    for (i in 1 until units.size step 2) {
-        if (units[i].toDoubleOrNull() == null || units[i - 1].toDoubleOrNull() != null) return ""
-            // если порядок не продукт-цена-продукт-цена,то это нарушение формата
-        else {
-            if (units[i].toDouble() >= maxVal) {
-                maxVal = units[i].toDouble()
-                name = units[i - 1]
+    try {
+        for (item in units) {
+            if (item[1].toDouble() > maxVal) {
+                maxVal = item[1].toDouble()
+                name = item[0]
             }
         }
+
+    } catch (e: IndexOutOfBoundsException) {
     }
     return name
 }
