@@ -5,6 +5,7 @@ package lesson7.task1
 import lesson2.task1.timeForHalfWay
 import java.io.File
 import kotlin.math.*
+
 /**
  * Пример
  *
@@ -169,27 +170,26 @@ fun centerFile(inputName: String, outputName: String) {
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
     val outputStream = File(outputName).bufferedWriter()
-    var maxLen = 0
-    for (line in File(inputName).readLines())
-        if (line.trim().length > maxLen) maxLen = line.trim().length
-    for (line in File(inputName).readLines()) {
-        if (line.isEmpty() || !"""[^\s]""".toRegex().containsMatchIn(line)) {  //если пустая или ничего, кроме пробелов
-
+    val lines = File(inputName).readLines().map { it.replace("""\s+""".toRegex(), " ").trim() }
+    val maxLen = lines.map { it.length }.max() ?: 0
+    for (line in lines) {
+        if (line.isEmpty()) {  //если пустая или ничего, кроме пробелов
             outputStream.newLine()
             continue
-        } else if (line.trim().split(" ").size == 1) {
-            outputStream.write(line.trim())
+        } else if (line.split(" ").size == 1) {
+            outputStream.write(line)
             outputStream.newLine()
             continue
         } else {
-            val rawLen = line.trim().length                         // чтобы знать,до скольки символов дополнять
-            val setOfWords = line.trim().split(" ")
-            val numOfBackspacesBlocks = setOfWords.size - 1            //мест между одним и вторым словом
-            val currRawAmountOfBackspaces = maxLen - rawLen + numOfBackspacesBlocks
-                                                                                //сколько всего пробелов ракидывать будем-с?
-            val commonNumOfBackspaces = currRawAmountOfBackspaces / numOfBackspacesBlocks
-                                                                            //без прибавления остатка, поровну, пробелов
-            val r = currRawAmountOfBackspaces % numOfBackspacesBlocks   //остаток,который нужно раскидать по одному в начале
+            val rawLen = line.length                                   // чтобы знать,до скольки символов дополнять
+            val setOfWords = line.split(" ")
+            val numOfBackspacesBlocks = setOfWords.size - 1                      //мест между одним и вторым словом
+            val currRawAmountOfBackspaces =                                           //сколько пробелов ракидывать
+                    maxLen - rawLen + numOfBackspacesBlocks
+            val commonNumOfBackspaces =                                //без прибавления остатка, поровну, пробелов
+                    currRawAmountOfBackspaces / numOfBackspacesBlocks
+            val r =                                            //остаток,который нужно раскидать по одному в начале
+                    currRawAmountOfBackspaces % numOfBackspacesBlocks
             var resultString = ""
             for (i in 0 until r) {
                 resultString = resultString + setOfWords[i] + " ".repeat(commonNumOfBackspaces + 1)
